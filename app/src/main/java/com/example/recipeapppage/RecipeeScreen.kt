@@ -1,6 +1,7 @@
 package com.example.recipeapppage
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,15 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.recipeapppage.ui.theme.RecipeViewModel
-import java.nio.file.WatchEvent
 
 @Composable
-fun Screen(modifier: Modifier = Modifier) {
+fun Screen(modifier: Modifier = Modifier, NavigateToDetail: (Category) -> Unit) {
     val RecipeScreen: RecipeViewModel = viewModel()
     val viewstate by RecipeScreen.categoriesState
     Box(modifier = Modifier.fillMaxSize()) {
@@ -42,7 +41,7 @@ fun Screen(modifier: Modifier = Modifier) {
             }
 
             else -> {
-         CategoryScreen(categories = viewstate.list)
+                CategoryScreen(categories = viewstate.list, NavigateToDetail)
             }
 
         }
@@ -50,13 +49,13 @@ fun Screen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CategoryScreen(categories: List<Category>) {
+fun CategoryScreen(categories: List<Category>, NavigateToDetail: (Category) -> Unit) {
     LazyVerticalGrid(
         GridCells.Fixed(2),
         modifier = Modifier.fillMaxSize()
     ) {
-        items(categories){ category->
-            CategoryItem(category)
+        items(categories) { category ->
+            CategoryItem(category, NavigateToDetail)
 
         }
     }
@@ -64,11 +63,15 @@ fun CategoryScreen(categories: List<Category>) {
 }
 
 @Composable
-fun CategoryItem(category: Category) {
+fun CategoryItem(
+    category: Category,
+    NavigateToDetail: (Category) -> Unit
+) {
     Column(
         modifier = Modifier
             .padding(8.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable { NavigateToDetail(category) },
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
 
@@ -77,6 +80,7 @@ fun CategoryItem(category: Category) {
             painter = rememberAsyncImagePainter(category.strCategoryThumb),
             contentDescription = "view me", modifier = Modifier
                 .fillMaxSize()
+                .clickable { NavigateToDetail(category) }
                 .aspectRatio(1f)
         )
         Text(
